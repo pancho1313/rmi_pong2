@@ -26,12 +26,14 @@ public class Pong implements KeyListener {
 	private Bar myBar;
 	public Bar ball;
 
-	private double vx = 0.4, vy = 0.3;
+	
+	private double reboundAngle;//in rads
+	private double ballSpeed;
 
 	public boolean[] keysPressed;
 	public boolean[] keysReleased;
 	
-	//TODO: is this right?
+
 	private Player myPlayer;
 	private IPongServer pongServer;
 	private boolean suicide;
@@ -43,12 +45,15 @@ public class Pong implements KeyListener {
 		canvas.reset();
 		canvas.myPlayerId = myPlayer.getPlayerId();
 		bars = canvas.bars;
-		myBar = bars[myPlayer.getPlayerId()];//TODO: ojo con una posible reasignacion de bars
+		myBar = bars[myPlayer.getPlayerId()];
 		ball = canvas.ball;
 	}
 	
 	public Pong(Player _myPlayer, IPongServer _pongServer) {
 
+		reboundAngle = 65 * Math.PI / 180;
+		ballSpeed = 2;
+		
 		myPlayer = _myPlayer;
 		pongServer = _pongServer;
 		
@@ -156,10 +161,16 @@ public class Pong implements KeyListener {
 			}
 		});
 		game.start();
+		try {
+			game.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.exit(0);
 	}
 
 	/*------------------------------------------*/
-	/*TODO: mover este grupo a MyUtil?*/
 	
 	@Override
 	public void keyPressed(KeyEvent event) {
@@ -255,9 +266,15 @@ public class Pong implements KeyListener {
 	            			
 	            			double pong = myBar.y - myBar.top();
 	            			double ping = myBar.y - ball.y;
-	            			ball.vx = -ball.vx;
 	            			ball.y += ball.vy;
-	            			ball.vy = (ping/pong);//TODO: recalcular...
+	            			
+	            			//vector velocidad
+	            			double y_ = 0;
+	            			double x_ = ballSpeed;
+	            			//rotar vector
+	            			double angle = reboundAngle*(ping/pong);
+	            			ball.vy = x_*Math.sin(angle) + y_*Math.cos(angle);
+	            			ball.vx = x_*Math.cos(angle) - y_*Math.sin(angle);
 	            			
 	            			mustSendBallPos = true;
 	            			break;
@@ -292,9 +309,15 @@ public class Pong implements KeyListener {
 	            			
 	            			double pong = myBar.y - myBar.top();
 	            			double ping = myBar.y - ball.y;
-	            			ball.vx = -ball.vx;
 	            			ball.y += ball.vy;
-	            			ball.vy = (ping/pong);//TODO: recalcular...
+	            			
+	            			//vector velocidad
+	            			double y_ = 0;
+	            			double x_ = -ballSpeed;
+	            			//rotar vector
+	            			double angle = -reboundAngle*(ping/pong);
+	            			ball.vy = x_*Math.sin(angle) + y_*Math.cos(angle);
+	            			ball.vx = x_*Math.cos(angle) - y_*Math.sin(angle);
 	            			
 	            			mustSendBallPos = true;
 	            			break;
@@ -328,10 +351,15 @@ public class Pong implements KeyListener {
 	            			
 	            			double pong = myBar.x - myBar.left();
 	            			double ping = myBar.x - ball.x;
-	            			ball.vy = -ball.vy;
 	            			ball.x += ball.vx;
 	            			
-	            			ball.vx = (ping/pong);//TODO: recalcular...
+	            			//vector velocidad
+	            			double y_ = ballSpeed;
+	            			double x_ = 0;
+	            			//rotar vector
+	            			double angle = -reboundAngle*(ping/pong);
+	            			ball.vy = x_*Math.sin(angle) + y_*Math.cos(angle);
+	            			ball.vx = x_*Math.cos(angle) - y_*Math.sin(angle);
 	            			
 	            			
 	            			mustSendBallPos = true;
@@ -366,10 +394,15 @@ public class Pong implements KeyListener {
 	            			
 	            			double pong = myBar.x - myBar.left();
 	            			double ping = myBar.x - ball.x;
-	            			ball.vy = -ball.vy;
 	            			ball.x += ball.vx;
 	            			
-	            			ball.vx = (ping/pong);//TODO: recalcular...
+	            			//vector velocidad
+	            			double y_ = -ballSpeed;
+	            			double x_ = 0;
+	            			//rotar vector
+	            			double angle = reboundAngle*(ping/pong);
+	            			ball.vy = x_*Math.sin(angle) + y_*Math.cos(angle);
+	            			ball.vx = x_*Math.cos(angle) - y_*Math.sin(angle);
 	            			
 	            			mustSendBallPos = true;
 	            			break;

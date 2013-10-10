@@ -18,7 +18,7 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 	public static final int WAITING_NEW_MATCH = 0;
 	public static final int BRACE_YOURSELF = 1;//transitorio, para saludar a los contendientes
 	public static final int PLAYING_MATCH = 2;
-	public static final int SHOW_MATCH_RESULTS = 3;//TODO: opcion para jugar de nuevo?
+	public static final int SHOW_MATCH_RESULTS = 3;
 	public static final int GAME_OVER = 4;
 	public static final int RESET = 5;
 	

@@ -29,12 +29,14 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void reInitMatch(){
-		serverState = WAITING_FOR_PLAYERS;
+		
 		activePlayers = 0;
 		players = new IPlayer[4];
 		
 		playersScore = new int[4];
 		lastPlayerRebound = -1;
+		
+		serverState = WAITING_FOR_PLAYERS;
 	}
 	
 	private int addToPlayers(IPlayer p){
@@ -189,9 +191,7 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 				lastPlayerRebound = -1;
 			activePlayers--;
 			
-			if(activePlayers < 2){
-				//TODO: que hacer si todos se van???
-			}
+			
 			
 			U.localMessage("player"+ playerId+" quit.");
 			
@@ -202,6 +202,13 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 					U.localMessage("aviso a player " +i);
 					p.enemyGone(playerId);
 				}
+			}
+			
+			/**
+			 * si todos se fueron antes de terminar la partida
+			 * */
+			if(activePlayers < 1){
+				gameOver();
 			}
 			
 			break;

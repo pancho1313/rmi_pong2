@@ -43,7 +43,7 @@ public class Client {
 	}
 	
 	private void startPongWindow(){
-		new Pong(myPlayer, server);
+		Pong myPong = new Pong(myPlayer, server);
 	}
 	
 	

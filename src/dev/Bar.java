@@ -22,10 +22,10 @@ public class Bar {
 
 	public void draw(Graphics g) {
 		if(!hidden){
-			Color prevColor = g.getColor();//TODO: necesario?
+			Color prevColor = g.getColor();
 			g.setColor(color);
 			g.fillRect(left(), top(), (int) w, (int) h);
-			g.setColor(prevColor);//TODO: necesario?
+			g.setColor(prevColor);
 		}
 	}
 
