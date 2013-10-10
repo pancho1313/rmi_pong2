@@ -143,7 +143,7 @@ public class Pong implements KeyListener {
 			        
 					//repintar el canvas
 					canvas.gameState = state;
-					canvas.repaint();
+					canvas.repaintMyCanvas();
 
 					//regular los fps
 					try {

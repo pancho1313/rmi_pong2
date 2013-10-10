@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Canvas;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferStrategy;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -31,6 +33,8 @@ public class MyCanvas extends Canvas {
 	 */
 	private static final long serialVersionUID = -1104510752775347794L;
 	
+	private BufferStrategy strategy;
+	
 	public int myPlayerId;
 	public Color ballColor;
 	public Bar[] bars;
@@ -41,6 +45,13 @@ public class MyCanvas extends Canvas {
 	public MyCanvas(int WIDTH, int HEIGHT){
 		super();
 		this.setSize(WIDTH, HEIGHT);
+		
+		// Tell AWT not to bother repainting our canvas since we're
+		// going to do that our self in accelerated mode
+		setIgnoreRepaint(true);
+		// create the buffering strategy which will allow AWT
+
+		strategy = null;
 		
 		//default values
 		reset();
@@ -59,8 +70,18 @@ public class MyCanvas extends Canvas {
 		gameState = Player.WAITING_NEW_MATCH;
 	}
 	
-	public void paint(Graphics g) {
+	public void repaintMyCanvas() {
 
+		// to manage our accelerated graphics
+		if(strategy == null){
+			createBufferStrategy(2);
+			strategy = getBufferStrategy();
+		}
+		
+		// Get hold of a graphics context for the accelerated
+		// surface and blank it out
+		Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+		
 		switch (gameState) {
         case Player.WAITING_NEW_MATCH:
         	paintWaiting(g);
@@ -82,6 +103,8 @@ public class MyCanvas extends Canvas {
     }
 		
 		
+		g.dispose();
+		strategy.show();
 
 	}
 	
