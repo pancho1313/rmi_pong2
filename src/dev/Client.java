@@ -12,24 +12,18 @@ public class Client {
 
 	static MyUtil U = new MyUtil();
 	private Player myPlayer;
+	private ISServer sServer;
 	private IPongServer server;
+	private String serverIp;
 	
-	//thread
-	
-	public Client(String ipHost, String ipGuest){
+	public Client(String ipLocalHost, String ipSServer){
+		System.setProperty("java.rmi.server.hostname", ipLocalHost);
+		U.localMessage("Connecting to PongServer...");
+		
+		//contactar al SServer y obtener la ip del servidor activo
 		try {
-			System.setProperty("java.rmi.server.hostname", ipGuest);
-			U.localMessage("Connecting to PongServer...");
-			server = (IPongServer) Naming.lookup("//"+ipHost+":1099/PongServer");
-			
-			myPlayer = new Player();
-			if(server.iWantToPlay((IPlayer)myPlayer)){
-				startPongWindow();
-			}else{
-				U.localMessage("Not now my friend, go home.");
-				System.exit(0);
-			}
-			
+			sServer = (ISServer) Naming.lookup("//"+ipSServer+":1099/SServer");
+			serverIp = sServer.whoIstheServer();
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -40,18 +34,53 @@ public class Client {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		//contactar al server
+		try {
+			server = (IPongServer) Naming.lookup("//"+serverIp+":1099/PongServer");
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//crear myPlayer
+		try {
+			myPlayer = new Player();
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		//pedir jugar pong
+		try {
+			if(server.iWantToPlay((IPlayer)myPlayer)){
+				startPongWindow();
+				return;
+			}
+		} catch (RemoteException e) {}
+		
+		
+		U.localMessage("Not now my friend, try later.");
+		System.exit(0);
 	}
 	
 	private void startPongWindow(){
-		Pong myPong = new Pong(myPlayer, server);
+		new Pong(myPlayer, server);
 	}
 	
 	
 	
 	public static void main(String[] args) {
-		String ipHost = U.getArg(args, 0, "192.168.2.14", "WARNING: no se ha especificado HOST.");
-		String ipGuest = U.getArg(args, 1, "192.168.2.14", "WARNING: no se ha especificado LOCALHOST.");
-		new Client(ipHost, ipGuest);
+		String ipLocalHost = U.getArg(args, 0, "ERROR: no se ha especificado LOCALHOST IP!");
+		String[] ipSServer = U.getRestOfArgs(args, 1, "WARNING: no se ha especificado SSERVER IP!");
+		new Client(ipLocalHost, ipSServer);
 	}
 	
 }

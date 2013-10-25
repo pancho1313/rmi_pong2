@@ -51,8 +51,8 @@ public class Pong implements KeyListener {
 	
 	public Pong(Player _myPlayer, IPongServer _pongServer) {
 
-		reboundAngle = 65 * Math.PI / 180;
-		ballSpeed = 2;
+		reboundAngle = 65 * Math.PI / 180;//angulo de rebote
+		ballSpeed = 4;
 		
 		myPlayer = _myPlayer;
 		pongServer = _pongServer;
@@ -60,7 +60,7 @@ public class Pong implements KeyListener {
 		
 		keysPressed = new boolean[KeyEvent.KEY_LAST];
 		keysReleased = new boolean[KeyEvent.KEY_LAST];
-		suicide = false;
+		suicide = false;//babies dont die
 		init();
 
 	}

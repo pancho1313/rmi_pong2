@@ -19,7 +19,8 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	//private static final long serialVersionUID = 6311160989789331741L;
 	private int nPlayers;
 	private int winScore;
-	private String ipHost;
+	//private String ipHost;
+	private String[] otherIpHosts;
 	
 	private IPlayer[] players;
 	private int[] playersScore;
@@ -58,6 +59,21 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 		return -1;
 	}
 	
+	private void shakeHandsPlease(){
+		for(int id = 0; id < players.length; id++){
+			IPlayer player = players[id];
+			if(player != null){
+				
+				try {
+					player.informPosition();
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		}
+	}
 	
 	private boolean addPlayer(IPlayer newPlayer) throws RemoteException{
 		
@@ -112,17 +128,14 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	
 	static MyUtil U = new MyUtil();
 	
-	public PongServer(int _nPlayers, int winScore, String ipHost) throws RemoteException{
+	public PongServer(int _nPlayers, int winScore, String[] _otherIpHosts) throws RemoteException{
 		super();
 		U.localMessage("PongServer Started. (" + _nPlayers +" players)");
-		nPlayers = _nPlayers;//TODO: validar el rango de valores
-		this.ipHost = ipHost;
+		nPlayers = (_nPlayers < 0) ? 0 : _nPlayers;
+		//this.ipHost = ipHost;
+		this.otherIpHosts = _otherIpHosts;
 		this.winScore = winScore;
 		
-		activePlayers = 0;
-		players = new IPlayer[4];
-		
-		serverState = WAITING_FOR_PLAYERS;
 		U.localMessage("Waiting " + nPlayers + " players.");
 		
 		reInitMatch();
@@ -226,8 +239,8 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 			IPlayer player = players[id];
 			if(player != null){
 			
-				if(id != playerId){//TODO: quizas se pueda aniadir un filtro de jugadores activos?
-					players[id].refreshEnemyPos(playerId, x, y);
+				if(id != playerId){
+					player.refreshEnemyPos(playerId, x, y);
 				}
 			
 			}
@@ -256,10 +269,10 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 			if(player != null){
 				
 				if(id != playerId){
-					players[id].refreshBall(playerId, missedBall, x, y, vx, vy);
+					player.refreshBall(playerId, missedBall, x, y, vx, vy);
 				}
 				if(refreshScores){
-					players[id].refreshScores(playersScore);
+					player.refreshScores(playersScore);
 				}
 				
 			}
@@ -287,7 +300,7 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 		
 		reInitMatch();
 	}
-	
+	/*
 	public void iWantToPlayAgain(int playerId) throws RemoteException{
 		if(serverState == MATCH_FINISHED){
 			//TODO: lo registra como preparado
@@ -300,4 +313,5 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 			}
 		}
 	}
+	*/
 }

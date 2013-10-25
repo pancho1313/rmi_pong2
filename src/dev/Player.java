@@ -48,8 +48,6 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 	}
 	
 	private void setBall(int enemyId, boolean missedBall, double x, double y, double vx, double vy){
-		refreshBallPos = true;
-		
 		ballParameters[0] = x;
 		ballParameters[1] = y;
 		ballParameters[2] = vx;
@@ -57,6 +55,8 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 		
 		refreshBallColor = !missedBall;
 		ballParameters[4] = (double)enemyId;
+		
+		refreshBallPos = true;
 	}
 	
 	/**
@@ -124,6 +124,7 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 		refreshScores = true;
 		ballParameters = new double[5];//[x,y,vx,vy,color]
 	}
+	
 	/**
 	 * setea las variables del player para prepararse a empezar una nueva partida de pong
 	 **/
@@ -145,6 +146,10 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 		activePlayers[enemyId] = true;//TODO: eto desperdicia el sistema local
 		barsPos[enemyId][0] = x;
 		barsPos[enemyId][1] = y;
+	}
+	
+	public void informPosition() throws RemoteException{
+		gameState = BRACE_YOURSELF;
 	}
 	
 	/**

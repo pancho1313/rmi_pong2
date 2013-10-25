@@ -15,5 +15,6 @@ public interface IPlayer extends Remote {
 	public void refreshScores(int[] scores) throws RemoteException;
 	public void showMatchResults() throws RemoteException;
 	public void enemyGone(int enemyId) throws RemoteException;
+	public void informPosition() throws RemoteException;
 
 }
