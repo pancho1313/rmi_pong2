@@ -2,6 +2,7 @@ package dev;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -11,29 +12,79 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 
 	private ArrayList<String> serversIp;
 	private int activeServer;
+	private int nPlayers;
+	private int winScore;
 	
 	static MyUtil U = new MyUtil();
 	
 	public SServer(int numPlayers, int winScore) throws RemoteException{
 		serversIp = new ArrayList<String>();
 		activeServer = -1;
+		this.nPlayers = numPlayers;
+		this.winScore = winScore;
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void iWantToServe(String ip) throws RemoteException{
+	public boolean iWantToServe(String ip) throws RemoteException{
+		U.localMessage("<< ["+ip+"]: deseo servir...");
 		serversIp.add(ip);
+		U.localMessage("{"+ip+"} agregado a serversIP["+(serversIp.size()-1)+"]");
 		if(serversIp.size() == 1){
 			activeServer = 0;
+			setInitialServer(ip);
+			U.localMessage("activeServer = serversIP["+activeServer+"] = {"+ip+"}");
+			return true;
+		}else{
+			return false;
 		}
+		
 	}
 	
 	public String whoIstheServer() throws RemoteException{
+		U.localMessage("<< whoIstheServer?");
 		if(activeServer >= 0){
+			U.localMessage(">> ["+serversIp.get(activeServer)+"]");
 			return serversIp.get(activeServer);
 		}else{
-			return "blablablablabla";//TODO: esto es muy feo!
+			U.localMessage(">> no hay un server activo!");
+			return "";//TODO: esto es muy feo!
 		}
 	}
-	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private void setInitialServer(String ipServer){
+		IPongServer server;
+		
+		//contactar al servidor inicial
+		try {
+			server = (IPongServer) Naming.lookup("//"+ipServer+":1099/PongServer");
+			
+			//crear parametros iniciales del server
+			int nPlayers = this.nPlayers;
+			int winScore = this.winScore;
+			int activePlayers = 0;
+			IPlayer[] players = new IPlayer[4];
+			int[] playersScore = new int[4];
+			int lastPlayerRebound = -1;
+			int serverNextState = PongServer.WAITING_FOR_PLAYERS;
+			
+			//enviar parametros iniciales al server
+			try {
+				server.recieveServerSettings(nPlayers, winScore, activePlayers, players, playersScore, lastPlayerRebound, serverNextState);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void main(String[] args) {
 		String ipLocalHost = U.getArg(args, 0, "ERROR: no se ha especificado LOCALHOST IP!");
@@ -58,6 +109,7 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 		try {
 			ISServer sServer = new SServer(numPlayers, winScore);
 			Naming.rebind("rmi://localhost:1099/SServer", sServer);
+			U.localMessage("SServer iniciado para "+numPlayers+" players.");
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

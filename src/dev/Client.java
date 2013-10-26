@@ -25,14 +25,11 @@ public class Client {
 			sServer = (ISServer) Naming.lookup("//"+ipSServer+":1099/SServer");
 			serverIp = sServer.whoIstheServer();
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			cantPlay();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			cantPlay();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			cantPlay();
 		}
 		
 		
@@ -40,14 +37,11 @@ public class Client {
 		try {
 			server = (IPongServer) Naming.lookup("//"+serverIp+":1099/PongServer");
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			cantPlay();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			cantPlay();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			cantPlay();
 		}
 		
 		//crear myPlayer
@@ -62,24 +56,29 @@ public class Client {
 		try {
 			if(server.iWantToPlay((IPlayer)myPlayer)){
 				startPongWindow();
-				return;
+			}else{
+				cantPlay();
 			}
-		} catch (RemoteException e) {}
+		} catch (RemoteException e) {
+			cantPlay();
+		}
 		
 		
-		U.localMessage("Not now my friend, try later.");
-		System.exit(0);
+		
 	}
 	
 	private void startPongWindow(){
 		new Pong(myPlayer, server);
 	}
 	
-	
+	private void cantPlay(){
+		U.localMessage("Not now my friend, try later.");
+		System.exit(0);
+	}
 	
 	public static void main(String[] args) {
 		String ipLocalHost = U.getArg(args, 0, "ERROR: no se ha especificado LOCALHOST IP!");
-		String[] ipSServer = U.getRestOfArgs(args, 1, "WARNING: no se ha especificado SSERVER IP!");
+		String ipSServer = U.getArg(args, 1, "ERROR: no se ha especificado SSERVER IP!");
 		new Client(ipLocalHost, ipSServer);
 	}
 	

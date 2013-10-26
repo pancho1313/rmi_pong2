@@ -9,9 +9,10 @@ import java.util.ArrayList;
 
 public class PongServer extends UnicastRemoteObject implements IPongServer{
 	
-	private static final int WAITING_FOR_PLAYERS = 0;
-	private static final int PLAYING_MATCH = 1;
-	private static final int MATCH_FINISHED = 2;
+	public static final int WAITING_FOR_PLAYERS = 0;
+	public static final int PLAYING_MATCH = 1;
+	public static final int MATCH_FINISHED = 2;
+	public static final int MIGRATING = 3;
 	
 	private int serverState;//estado del pongServer
 	//////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,13 +20,11 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	//private static final long serialVersionUID = 6311160989789331741L;
 	private int nPlayers;
 	private int winScore;
-	//private String ipHost;
-	private String[] otherIpHosts;
+	private String ipHost;
 	
 	private IPlayer[] players;
 	private int[] playersScore;
 	private int lastPlayerRebound;
-	private int againPlayers;
 	private int activePlayers;
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -110,7 +109,6 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	 * gestionar el comienzo de una partida, la bandeja de players esta comlpleta.
 	 * */
 	private void startNewMatch() throws RemoteException{
-		//reInitMatch();
 		
 		serverState = PLAYING_MATCH;
 		
@@ -128,18 +126,18 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	
 	static MyUtil U = new MyUtil();
 	
-	public PongServer(int _nPlayers, int winScore, String[] _otherIpHosts) throws RemoteException{
+	public PongServer(String _ipHost) throws RemoteException{
 		super();
-		U.localMessage("PongServer Started. (" + _nPlayers +" players)");
-		nPlayers = (_nPlayers < 0) ? 0 : _nPlayers;
-		//this.ipHost = ipHost;
-		this.otherIpHosts = _otherIpHosts;
-		this.winScore = winScore;
 		
-		U.localMessage("Waiting " + nPlayers + " players.");
+		this.ipHost = _ipHost;
+		
+		//valores iniciales de un server standar
+		this.winScore = 10;
+		nPlayers = 0;
 		
 		reInitMatch();
 	}
+	
 	
 	/**
 	 * para que un player pueda ser publicado por el pongServer
@@ -300,18 +298,17 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 		
 		reInitMatch();
 	}
-	/*
-	public void iWantToPlayAgain(int playerId) throws RemoteException{
-		if(serverState == MATCH_FINISHED){
-			//TODO: lo registra como preparado
-			againPlayers++;
-			players[playerId].preNewGame();
-			
-			//nadie guatio
-			if(againPlayers == nPlayers){
-			 startNewMatch();
-			}
-		}
+	
+	public void recieveServerSettings(int nPlayers, int winScore, int activePlayers, IPlayer[] players, int[] playersScore, int lastPlayerRebound, int serverNextState) throws RemoteException{
+		serverState = MIGRATING;
+		
+		this.nPlayers = nPlayers;
+		this.winScore = winScore;
+		this.activePlayers = activePlayers;
+		this.players = players;
+		this.playersScore = playersScore;
+		this.lastPlayerRebound = lastPlayerRebound;
+		
+		serverState = serverNextState;
 	}
-	*/
 }
