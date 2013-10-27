@@ -186,8 +186,15 @@ public class SSLoop implements KeyListener {
 			exitSSLoop();
 		}else if(keysPressed[KeyEvent.VK_M]){
 			//TODO: migrate
-			
 			System.out.println("Migrate!");
+			
+			//avisar que debe migrar a ...
+			try {
+				servers.get("192.168.2.10").migrate("192.168.2.14");
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			/* AL FINALLLLL
 			 * cambiar ip del server activo...

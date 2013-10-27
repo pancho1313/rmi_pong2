@@ -15,6 +15,22 @@ public class Server {
 		String ipSServer = U.getArg(args, 1, "ERROR: no se ha especificado SSERVER IP!");
 		////////////////////////////////
 		
+		//revisar si ya existe un PongServer local
+		boolean clean = false;
+		try {
+			Naming.lookup("//"+ipLocalHost+":1099/PongServer");
+		} catch (MalformedURLException e1) {
+			clean = true;
+		} catch (RemoteException e1) {
+			clean = true;
+		} catch (NotBoundException e1) {
+			clean = true;
+		}
+		if(!clean){
+			U.localMessage("Ups! ya hay un PongServer :s");
+			return;
+		}
+		
 		//publicar el server
 		try {
 			System.setProperty("java.rmi.server.hostname", ipLocalHost);
