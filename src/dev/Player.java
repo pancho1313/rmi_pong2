@@ -31,6 +31,8 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 	public boolean refreshBallPos;
 	public boolean refreshBallColor;
 	public double[] ballParameters;
+	public String serverIp;
+	public boolean refreshServerIp;
 	private int gameState;//estado del juego del player
 	
 	/*-------------------------------*/
@@ -123,6 +125,8 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 		refreshBallColor = false;
 		refreshScores = true;
 		ballParameters = new double[5];//[x,y,vx,vy,color]
+		serverIp = "";
+		refreshServerIp = false;
 	}
 	
 	/**
@@ -172,5 +176,10 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 		scores[enemyId] = 0;
 		activePlayers[enemyId] = false;
 		refreshEnemyBars = true;
+	}
+	
+	public void refreshServerIp(String ip) throws RemoteException{
+		serverIp = ip;
+		refreshServerIp = true;
 	}
 }

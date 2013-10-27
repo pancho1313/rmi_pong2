@@ -10,8 +10,8 @@ import java.util.ArrayList;
 
 public class SServer extends UnicastRemoteObject implements ISServer{
 
-	private ArrayList<String> serversIp;
-	private int activeServer;
+	public ArrayList<String> serversIp;
+	private String activeServer;
 	private int nPlayers;
 	private int winScore;
 	
@@ -19,7 +19,7 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 	
 	public SServer(int numPlayers, int winScore) throws RemoteException{
 		serversIp = new ArrayList<String>();
-		activeServer = -1;
+		activeServer = "";
 		this.nPlayers = numPlayers;
 		this.winScore = winScore;
 	}
@@ -29,25 +29,25 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 		serversIp.add(ip);
 		U.localMessage("{"+ip+"} agregado a serversIP["+(serversIp.size()-1)+"]");
 		if(serversIp.size() == 1){
-			activeServer = 0;
+			activeServer = ip;
 			setInitialServer(ip);
 			U.localMessage("activeServer = serversIP["+activeServer+"] = {"+ip+"}");
 			return true;
 		}else{
 			return false;
 		}
-		
 	}
 	
 	public String whoIstheServer() throws RemoteException{
 		U.localMessage("<< whoIstheServer?");
-		if(activeServer >= 0){
-			U.localMessage(">> ["+serversIp.get(activeServer)+"]");
-			return serversIp.get(activeServer);
-		}else{
-			U.localMessage(">> no hay un server activo!");
-			return "";//TODO: esto es muy feo!
+		if(!activeServer.equals("")){
+			U.localMessage(">> ["+activeServer+"]");
+			return activeServer;
 		}
+		
+		U.localMessage(">> no hay un server activo!");
+		return "";//TODO: esto es muy feo!
+		
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private void setInitialServer(String ipServer){
@@ -106,8 +106,9 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 		////////////////////////////////
 		
 		System.setProperty("java.rmi.server.hostname", ipLocalHost);
+		ISServer sServer = null;
 		try {
-			ISServer sServer = new SServer(numPlayers, winScore);
+			sServer = new SServer(numPlayers, winScore);
 			Naming.rebind("rmi://localhost:1099/SServer", sServer);
 			U.localMessage("SServer iniciado para "+numPlayers+" players.");
 		} catch (RemoteException e) {
@@ -117,6 +118,9 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		//loop
+		new SSLoop((SServer)sServer);
 	}
 
 }

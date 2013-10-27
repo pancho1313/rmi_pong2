@@ -12,7 +12,7 @@ public class Server {
 	
 	public static void main(String[] args) {
 		String ipLocalHost = U.getArg(args, 0, "ERROR: no se ha especificado LOCALHOST IP!");
-		String ipSServer = U.getArg(args, 1, "ERROR: no se ha especificado LOCALHOST IP!");
+		String ipSServer = U.getArg(args, 1, "ERROR: no se ha especificado SSERVER IP!");
 		////////////////////////////////
 		
 		//publicar el server

@@ -1,5 +1,8 @@
 package dev;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,7 +147,8 @@ public class Pong implements KeyListener {
 			        //procesar el input del usuario
 			        userKeys(state);
 			        
-			        
+			        //verificar si el server ha migrado
+			        refreshServerIp();
 			        
 					//repintar el canvas
 					canvas.gameState = state;
@@ -210,6 +214,26 @@ public class Pong implements KeyListener {
 			myPlayer.refreshScores = false;
 			
 			canvas.scores = myPlayer.scores; 
+		}
+	}
+	
+	private void refreshServerIp(){
+		if(myPlayer.refreshServerIp){
+			myPlayer.refreshServerIp = false;
+			String newIp = myPlayer.serverIp;
+			
+			try {
+				pongServer = (IPongServer) Naming.lookup("//"+newIp+":1099/PongServer");
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NotBoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	

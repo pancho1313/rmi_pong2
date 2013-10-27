@@ -164,14 +164,14 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	}
 	
 	public boolean iWantToPlay(IPlayer p) throws RemoteException{
+		U.localMessage("<< I want to play :)");
 		switch(serverState){
 		case WAITING_FOR_PLAYERS:
 			return addPlayer(p);
 		case PLAYING_MATCH:
 			return addPlayer(p);
-		case MATCH_FINISHED:
-			return false;
 		default:
+			U.localMessage(">> NO, go home!");
 			return false;
 		}
 	}
@@ -180,7 +180,7 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	 * Usado para gestionar la correcta salida de un player
 	 * */
 	public void iWantToQuit(int playerId) throws RemoteException{
-		
+		U.localMessage("<< [player"+playerId+"]: I want to quit =|");
 		switch(serverState){
 		case WAITING_FOR_PLAYERS:
 			
@@ -223,8 +223,7 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 			}
 			
 			break;
-		case MATCH_FINISHED:
-			//TODO:...
+		default:
 			break;
 		}
 	}
@@ -233,6 +232,9 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	 * informa al resto de los jugadores la nueva posicion de su bar.
 	 * */
 	public void iMovedMyBar(int playerId, double x, double y) throws RemoteException{
+		if(serverState == MIGRATING){
+			return;
+		}
 		for(int id = 0; id < players.length; id++){
 			IPlayer player = players[id];
 			if(player != null){
@@ -250,6 +252,9 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	 * ademas informa si el player perdio la bola.
 	 * */
 	public void refreshBall(int playerId, boolean missedBall, double x, double y, double vx, double vy) throws RemoteException{
+		if(serverState == MIGRATING){
+			return;
+		}
 		
 		//asignar puntaje
 		boolean refreshScores = false;
@@ -309,6 +314,47 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 		this.playersScore = playersScore;
 		this.lastPlayerRebound = lastPlayerRebound;
 		
+		U.localMessage("I'm active :D");
 		serverState = serverNextState;
+	}
+	
+	public void migrate(String newServerIp) throws RemoteException{
+		U.localMessage("Migrando desde "+ipHost+"a "+newServerIp);
+		//guardar el estado del server
+		int nextServerState = serverState;
+		
+		//para no atender ninguna peticion de los clientes
+		serverState = MIGRATING;
+		
+		//pasarle los parametros al siguiente server
+		try {
+			IPongServer nextServer = (IPongServer) Naming.lookup("//"+newServerIp+":1099/PongServer");
+			nextServer.recieveServerSettings(nPlayers, winScore, activePlayers, players, playersScore, lastPlayerRebound, nextServerState);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//informar a los clientes la nueva direccion del pongServer
+		for(int id = 0; id < players.length; id++){
+			IPlayer player = players[id];
+			if(player != null){
+				try {
+					player.refreshServerIp(newServerIp);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		//"desactivar" este server (queda como server de respaldo)
+		this.winScore = 10;
+		nPlayers = 0;
+		reInitMatch();
+		U.localMessage("fin de migracion. Ahora soy server de respaldo.");
 	}
 }
