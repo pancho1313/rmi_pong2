@@ -10,12 +10,18 @@ public class Server {
 
 	static MyUtil U = new MyUtil();
 	
+	private static void noSSFound(){
+		U.localMessage("Ups! cant connect to SS :o");
+		System.exit(0);
+	}
+	
 	public static void main(String[] args) {
 		String ipLocalHost = U.getArg(args, 0, "ERROR: no se ha especificado LOCALHOST IP!");
 		String ipSServer = U.getArg(args, 1, "ERROR: no se ha especificado SSERVER IP!");
 		////////////////////////////////
 		
 		//revisar si ya existe un PongServer local
+		/*
 		boolean clean = false;
 		try {
 			Naming.lookup("//"+ipLocalHost+":1099/PongServer");
@@ -30,6 +36,7 @@ public class Server {
 			U.localMessage("Ups! ya hay un PongServer :s");
 			return;
 		}
+		*/
 		
 		//publicar el server
 		try {
@@ -55,14 +62,11 @@ public class Server {
 				U.localMessage("Soy servidor de reserva :|");
 			}
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			noSSFound();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			noSSFound();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			noSSFound();
 		}
 	}
 
