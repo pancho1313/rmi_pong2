@@ -11,14 +11,17 @@ import java.util.ArrayList;
 public class SServer extends UnicastRemoteObject implements ISServer{
 
 	public ArrayList<String> serversIp;
-	private String activeServer;
+	public String activeServer;
 	private int nPlayers;
 	private int winScore;
+	
+	public boolean refreshServers;
 	
 	static MyUtil U = new MyUtil();
 	
 	public SServer(int numPlayers, int winScore) throws RemoteException{
 		serversIp = new ArrayList<String>();
+		refreshServers = false;
 		activeServer = "";
 		this.nPlayers = numPlayers;
 		this.winScore = winScore;
@@ -32,6 +35,7 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 			activeServer = ip;
 			setInitialServer(ip);
 			U.localMessage("activeServer = serversIP["+activeServer+"] = {"+ip+"}");
+			refreshServers = true;
 			return true;
 		}else{
 			return false;

@@ -319,7 +319,7 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	}
 	
 	public void migrate(String newServerIp) throws RemoteException{
-		U.localMessage("Migrando desde "+ipHost+"a "+newServerIp);
+		U.localMessage("Migrando desde "+ipHost+" a "+newServerIp);
 		//guardar el estado del server
 		int nextServerState = serverState;
 		

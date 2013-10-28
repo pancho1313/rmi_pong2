@@ -43,6 +43,7 @@ public class SSLoop implements KeyListener {
 	
 	public SSLoop(SServer _sServer) {
 		this.sServer = _sServer;
+		
 		this.servers = new HashMap<String,IPongServer>();
 		for(String key : sServer.serversIp){
 			servers.put(key, null);
@@ -93,8 +94,9 @@ public class SSLoop implements KeyListener {
 			@Override
 			public void run(){
 				while (!suicide){
+					refreshServers();
+					
 					Iterator<String> keySetIterator = servers.keySet().iterator();
-
 					while(keySetIterator.hasNext()){
 					  String ip = keySetIterator.next();
 					  if(servers.get(ip) != null){
@@ -189,20 +191,28 @@ public class SSLoop implements KeyListener {
 			System.out.println("Migrate!");
 			
 			//avisar que debe migrar a ...
+			String from = "192.168.2.10";
+			String to = "192.168.2.14";
 			try {
-				servers.get("192.168.2.10").migrate("192.168.2.14");
+				servers.get(from).migrate(to);
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("ERROR Migrate!");
 			}
 			
-			/* AL FINALLLLL
-			 * cambiar ip del server activo...
-			 * 
-			*/
+			//cambiar ip del server activo...
+			sServer.activeServer = to;
 		}
 	 }
 	 
-
+	 private void refreshServers(){
+		 if(sServer.refreshServers){
+			 sServer.refreshServers = false;
+			 
+			 this.servers = new HashMap<String,IPongServer>();
+			 for(String key : sServer.serversIp){
+				 servers.put(key, null);
+			 }
+		 }
+	 }
 
 }
