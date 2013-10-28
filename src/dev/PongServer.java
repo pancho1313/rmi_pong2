@@ -302,6 +302,7 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 		}
 		
 		reInitMatch();
+		U.localMessage("Match finished :)");
 	}
 	
 	public void recieveServerSettings(int nPlayers, int winScore, int activePlayers, IPlayer[] players, int[] playersScore, int lastPlayerRebound, int serverNextState) throws RemoteException{
@@ -356,5 +357,9 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 		nPlayers = 0;
 		reInitMatch();
 		U.localMessage("fin de migracion. Ahora soy server de respaldo.");
+	}
+	
+	public double getServerLoad() throws RemoteException{
+		return 0;
 	}
 }

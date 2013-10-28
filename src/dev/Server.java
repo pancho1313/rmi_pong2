@@ -21,10 +21,12 @@ public class Server {
 		////////////////////////////////
 		
 		//revisar si ya existe un PongServer local
-		/*
+		
 		boolean clean = false;
 		try {
-			Naming.lookup("//"+ipLocalHost+":1099/PongServer");
+			IPongServer dummy = (IPongServer) Naming.lookup("//"+ipLocalHost+":1099/PongServer");
+			double aux = dummy.getServerLoad();
+			U.localMessage("<< [actual server] server load = "+aux);
 		} catch (MalformedURLException e1) {
 			clean = true;
 		} catch (RemoteException e1) {
@@ -36,7 +38,7 @@ public class Server {
 			U.localMessage("Ups! ya hay un PongServer :s");
 			return;
 		}
-		*/
+		
 		
 		//publicar el server
 		try {
