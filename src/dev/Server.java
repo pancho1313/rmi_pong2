@@ -21,7 +21,6 @@ public class Server {
 		////////////////////////////////
 		
 		//revisar si ya existe un PongServer local
-		
 		boolean clean = false;
 		try {
 			IPongServer dummy = (IPongServer) Naming.lookup("//"+ipLocalHost+":1099/PongServer");

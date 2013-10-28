@@ -28,18 +28,27 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public boolean iWantToServe(String ip) throws RemoteException{
+		boolean youActive = false;
 		U.localMessage("<< ["+ip+"]: deseo servir...");
+		
+		//si ya existia esta ip en la lista de servers
+		for(String s : serversIp){
+			if(s.equals(ip)){
+				U.localMessage(">> ip repetida!  >:o");
+				return false;
+			}
+		}
+		
 		serversIp.add(ip);
 		U.localMessage("{"+ip+"} agregado a serversIP["+(serversIp.size()-1)+"]");
 		if(serversIp.size() == 1){
 			activeServer = ip;
 			setInitialServer(ip);
 			U.localMessage("activeServer = serversIP["+activeServer+"] = {"+ip+"}");
-			refreshServers = true;
-			return true;
-		}else{
-			return false;
+			youActive = true;
 		}
+		refreshServers = true;
+		return youActive;
 	}
 	
 	public String whoIstheServer() throws RemoteException{
@@ -90,6 +99,15 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 		}
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public boolean deadServer(String ip){
+		if(serversIp.remove(ip)){
+			U.localMessage("ip "+ip+" descartada como server  :,I");
+			refreshServers = true;
+			return true;
+		}
+		return false;
+	}
+	
 	public static void main(String[] args) {
 		String ipLocalHost = U.getArg(args, 0, "ERROR: no se ha especificado LOCALHOST IP!");
 		String nPlayers = U.getArg(args, 1, "ERROR: no se ha especificado la cantidad de jugadores!");

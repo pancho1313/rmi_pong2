@@ -96,29 +96,42 @@ public class SSLoop implements KeyListener {
 				while (!suicide){
 					refreshServers();
 					
+					ArrayList<Double> info = new ArrayList<Double>();
 					Iterator<String> keySetIterator = servers.keySet().iterator();
 					while(keySetIterator.hasNext()){
 					  String ip = keySetIterator.next();
-					  if(servers.get(ip) != null){
+					  IPongServer server = servers.get(ip);  
+					  if(server != null){
 						  //TODO: pedirles la carga academica
-						  // si no responde (hizo ctrl+c) --> informar su fallecimiento a sServer
-						  String[] str = {"0.0%","0.1%","0.6%","0.7%"};
-						  canvas.loadInfo = str;
-					  }else{
-						  IPongServer server;
+						  double load = -1;
+						  try {
+							load = server.getServerLoad();
+						} catch (RemoteException e) {
+							// si no responde (hizo ctrl+c) --> informar su fallecimiento --> deadServer(String ip)
+							if(deadServer(ip)){
+								continue;
+							}
+						}
 						  
+						  info.add(load);
+						  
+					  }else{
+						  IPongServer newServer;
 							try {
-								server = (IPongServer) Naming.lookup("//"+ip+":1099/PongServer");
-								servers.put(ip, server);
+								newServer = (IPongServer) Naming.lookup("//"+ip+":1099/PongServer");
+								servers.put(ip, newServer);
 							} catch (MalformedURLException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								if(deadServer(ip)){
+									continue;
+								}
 							} catch (RemoteException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								if(deadServer(ip)){
+									continue;
+								}
 							} catch (NotBoundException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								if(deadServer(ip)){
+									continue;
+								}
 							}
 						
 						  
@@ -129,6 +142,11 @@ public class SSLoop implements KeyListener {
 			        userKeys();
 			        
 					//repintar el canvas
+			        String[] str = new String[info.size()];
+			        for(int i = 0; i < str.length; i++){
+			        	str[i] = info.get(i).toString();
+			        }
+					canvas.loadInfo = str;
 					canvas.repaintSSCanvas();
 
 					//regular los fps
@@ -215,5 +233,11 @@ public class SSLoop implements KeyListener {
 			
 			//cambiar ip del server activo...
 			sServer.activeServer = to;
+	 }
+	 
+	 private boolean deadServer(String ip){
+		 System.out.println("dead server ip = "+ip);
+		 //informar el fallecimiento de un server (no responde)
+		 return sServer.deadServer(ip);
 	 }
 }
