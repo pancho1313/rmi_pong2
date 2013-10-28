@@ -102,7 +102,7 @@ public class SSLoop implements KeyListener {
 					  String ip = keySetIterator.next();
 					  IPongServer server = servers.get(ip);  
 					  if(server != null){
-						  //TODO: pedirles la carga academica
+						  //TODO: pedirles la carga academica y eventualmente migrar al que tenga menos...
 						  double load = -1;
 						  try {
 							load = server.getServerLoad();
