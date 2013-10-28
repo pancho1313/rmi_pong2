@@ -102,6 +102,9 @@ public class SServer extends UnicastRemoteObject implements ISServer{
 	public boolean deadServer(String ip){
 		if(serversIp.remove(ip)){
 			U.localMessage("ip "+ip+" descartada como server  :,I");
+			if(ip.equals(activeServer)){//TODO!!
+				U.localMessage("ERROR GRAVE: ha fallecido el PongServer Activo!  D:");
+			}
 			refreshServers = true;
 			return true;
 		}
