@@ -1,11 +1,14 @@
 package dev;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class PongServer extends UnicastRemoteObject implements IPongServer{
 	
@@ -360,6 +363,22 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	}
 	
 	public double getServerLoad() throws RemoteException{
-		return 0;
+		double[] loadavg = new double[3];
+		    Scanner scan;
+		    File file = new File("/proc/loadavg");
+		    try {
+		        scan = new Scanner(file);
+
+		        for(int i = 0; i < 3 && scan.hasNextDouble();i++)
+		        {
+		        	loadavg[i] = scan.nextDouble();
+		        }
+
+		    } catch (FileNotFoundException e1) {
+		            return -1;
+		    }
+
+		
+		return loadavg[0];//last [0]: 1 / [1]: 5 / [2]: 15 min
 	}
 }

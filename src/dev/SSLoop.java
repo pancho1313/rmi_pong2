@@ -19,7 +19,7 @@ import javax.swing.JFrame;
 public class SSLoop implements KeyListener {
 
 	public final static String TITLE = "Pong/SServer - CC5303";
-	public final static int WIDTH = 100, HEIGHT = 300;
+	public final static int WIDTH = 300, HEIGHT = 100;
 	public final static int UPDATE_RATE = 1;
 
 	public JFrame frame;
@@ -94,26 +94,35 @@ public class SSLoop implements KeyListener {
 			@Override
 			public void run(){
 				while (!suicide){
+					boolean doContinue = false;
 					refreshServers();
 					
-					ArrayList<Double> info = new ArrayList<Double>();
+					ArrayList<Double> info_load = new ArrayList<Double>();
+					ArrayList<String> info_ip = new ArrayList<String>();
 					Iterator<String> keySetIterator = servers.keySet().iterator();
 					while(keySetIterator.hasNext()){
 					  String ip = keySetIterator.next();
 					  IPongServer server = servers.get(ip);  
 					  if(server != null){
-						  //TODO: pedirles la carga academica y eventualmente migrar al que tenga menos...
+						  //TODO: pedirles la carga academica y eventualmente (>0.7) migrar al que tenga menos...
 						  double load = -1;
 						  try {
 							load = server.getServerLoad();
 						} catch (RemoteException e) {
 							// si no responde (hizo ctrl+c) --> informar su fallecimiento --> deadServer(String ip)
 							if(deadServer(ip)){
+								doContinue = true;
 								continue;
 							}
 						}
 						  
-						  info.add(load);
+						if(ip.equals(sServer.activeServer)){
+							if(load > 0.7){
+								//TODO: migrate!
+							}
+						}
+						  info_load.add(load);
+						  info_ip.add(ip);
 						  
 					  }else{
 						  IPongServer newServer;
@@ -122,14 +131,17 @@ public class SSLoop implements KeyListener {
 								servers.put(ip, newServer);
 							} catch (MalformedURLException e) {
 								if(deadServer(ip)){
+									doContinue = true;
 									continue;
 								}
 							} catch (RemoteException e) {
 								if(deadServer(ip)){
+									doContinue = true;
 									continue;
 								}
 							} catch (NotBoundException e) {
 								if(deadServer(ip)){
+									doContinue = true;
 									continue;
 								}
 							}
@@ -138,13 +150,17 @@ public class SSLoop implements KeyListener {
 					  }
 					}
 					
+					if(doContinue){
+						continue;
+					}
+					
 			        //procesar el input del usuario
 			        userKeys();
 			        
 					//repintar el canvas
-			        String[] str = new String[info.size()];
+			        String[] str = new String[info_load.size()];
 			        for(int i = 0; i < str.length; i++){
-			        	str[i] = info.get(i).toString();
+			        	str[i] = info_ip.get(i)+" : "+info_load.get(i).toString()+((info_ip.get(i).equals(sServer.activeServer))?" (active)":"");
 			        }
 					canvas.loadInfo = str;
 					canvas.repaintSSCanvas();
