@@ -118,7 +118,7 @@ public class SSLoop implements KeyListener {
 						  
 						if(ip.equals(sServer.activeServer)){
 							if(load > 0.7){
-								//TODO: migrate!
+								//TODO: if esiste un inactivo distponible migrate!
 							}
 						}
 						  info_load.add(load);
