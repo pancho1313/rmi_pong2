@@ -221,7 +221,7 @@ public class SSLoop implements KeyListener {
 		if(keysPressed[KeyEvent.VK_Q]){
 			exitSSLoop();
 		}else if(keysPressed[KeyEvent.VK_M]){
-			migrate("192.168.2.10", "192.168.2.14");
+			migrate("172.17.69.198", "172.17.69.199");
 		}
 	 }
 	 
