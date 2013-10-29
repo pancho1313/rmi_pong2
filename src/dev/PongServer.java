@@ -2,6 +2,8 @@ package dev;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -29,6 +31,8 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	private int[] playersScore;
 	private int lastPlayerRebound;
 	private int activePlayers;
+	
+	private static OperatingSystemMXBean mbean;
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void reInitMatch(){
@@ -133,6 +137,7 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 		super();
 		
 		this.ipHost = _ipHost;
+		mbean = ManagementFactory.getOperatingSystemMXBean();
 		
 		//valores iniciales de un server standar
 		this.winScore = 10;
@@ -363,6 +368,8 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 	}
 	
 	public double getServerLoad() throws RemoteException{
+		return mbean.getSystemLoadAverage();
+		/*
 		double[] loadavg = new double[3];
 		    Scanner scan;
 		    File file = new File("/proc/loadavg");
@@ -380,5 +387,6 @@ public class PongServer extends UnicastRemoteObject implements IPongServer{
 
 		
 		return loadavg[0];//last [0]: 1 / [1]: 5 / [2]: 15 min
+		*/
 	}
 }

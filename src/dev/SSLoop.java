@@ -97,6 +97,9 @@ public class SSLoop implements KeyListener {
 					boolean doContinue = false;
 					refreshServers();
 					
+					boolean migrate = false;
+					String migrateTo = "";
+					double minLoad = 1000;
 					ArrayList<Double> info_load = new ArrayList<Double>();
 					ArrayList<String> info_ip = new ArrayList<String>();
 					Iterator<String> keySetIterator = servers.keySet().iterator();
@@ -115,11 +118,17 @@ public class SSLoop implements KeyListener {
 								continue;
 							}
 						}
+						
 						  
 						if(ip.equals(sServer.activeServer)){
 							if(load > 0.7){
 								//TODO: if esiste un inactivo distponible migrate!
+								migrate = true;
 							}
+						}else if(load < minLoad){
+							//migrar al de carga minima
+							minLoad = load;
+							migrateTo = ip;
 						}
 						  info_load.add(load);
 						  info_ip.add(ip);
@@ -152,6 +161,11 @@ public class SSLoop implements KeyListener {
 					
 					if(doContinue){
 						continue;
+					}
+					
+					//Do migrate!
+					if(migrate && !migrateTo.equals("")){
+						migrate(sServer.activeServer,migrateTo);
 					}
 					
 			        //procesar el input del usuario
