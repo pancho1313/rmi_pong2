@@ -1,8 +1,14 @@
+para ejecutar super servidor:
+
+#bin/
+  rmiregistry &
+  java dev.Server <<ipLocalHost>> <<num players>>
+
 para ejecutar servidor:
 
 #bin/
   rmiregistry &
-  java dev.Server <<ipServer>> <<num players>>
+  java dev.Server <<ipLocalHost>> <<ipSuperServer>>
   
 
 
@@ -10,7 +16,7 @@ para ejecutar cliente
 
 #bin/
   rmiregistry &
-  java dev.Client <<ipServer>> <<ipClient>>
+  java dev.Client <<ipLocalHost>> <<ipSuperServer>>
   
 
 
