@@ -46,7 +46,7 @@ public class Client {
 		
 		//crear myPlayer
 		try {
-			myPlayer = new Player();
+			myPlayer = new Player(ipSServer);
 		} catch (RemoteException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

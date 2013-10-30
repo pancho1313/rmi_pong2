@@ -35,6 +35,8 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 	public boolean refreshServerIp;
 	private int gameState;//estado del juego del player
 	
+	public String sServerIp;
+	
 	/*-------------------------------*/
 	
 	
@@ -65,11 +67,11 @@ public class Player extends UnicastRemoteObject implements IPlayer{
 	 * Constructor:
 	 * crea un nuevo player
 	 * */
-	public Player() throws RemoteException{
+	public Player(String _sServerIp) throws RemoteException{
 		super();
 		
 		//variables de estado
-		
+		sServerIp = _sServerIp;
 		reInit();
 		gameState = WAITING_NEW_MATCH;
 	}

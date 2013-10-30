@@ -539,23 +539,55 @@ public class Pong implements KeyListener {
         		 myPlayer.setGameState(Player.GAME_OVER);
         	 }
         	 if(keysPressed[KeyEvent.VK_Y]){
-        		 //reset();
-        		 myPlayer.setGameState(Player.WAITING_NEW_MATCH);
-        		 try {
-					//pongServer.iWantToPlayAgain(myPlayer.getPlayerId());
-        			 if(!pongServer.iWantToPlay(myPlayer)){
-        				 myPlayer.setGameState(Player.GAME_OVER);
-        			 }
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+        		 oneMoreMatchPlease();
         	 }
          	break;
          default:
          	/*algoDefault();*/
          	break;
 		 }
+	 }
+	 
+	 private void oneMoreMatchPlease(){
+		 myPlayer.setGameState(Player.WAITING_NEW_MATCH);
+		 
+		 //////////////////////////////////////////////////////////77 TODO: refactoring
+		 ISServer sServer;
+		 String ipSServer = myPlayer.sServerIp;
+		 String serverIp = "";
+		//contactar al SServer y obtener la ip del servidor activo
+			try {
+				sServer = (ISServer) Naming.lookup("//"+ipSServer+":1099/SServer");
+				serverIp = sServer.whoIstheServer();
+			} catch (MalformedURLException e) {
+				myPlayer.setGameState(Player.GAME_OVER);
+			} catch (RemoteException e) {
+				myPlayer.setGameState(Player.GAME_OVER);
+			} catch (NotBoundException e) {
+				myPlayer.setGameState(Player.GAME_OVER);
+			}
+			
+			
+			//contactar al server
+			try {
+				pongServer = (IPongServer) Naming.lookup("//"+serverIp+":1099/PongServer");
+			} catch (MalformedURLException e) {
+				myPlayer.setGameState(Player.GAME_OVER);
+			} catch (RemoteException e) {
+				myPlayer.setGameState(Player.GAME_OVER);
+			} catch (NotBoundException e) {
+				myPlayer.setGameState(Player.GAME_OVER);
+			}
+			
+		 ////////////////////////////////////////////////////////////77
+		//pedir jugar pong
+		 try {
+ 			 if(!pongServer.iWantToPlay(myPlayer)){
+ 				 myPlayer.setGameState(Player.GAME_OVER);
+ 			 }
+			} catch (RemoteException e) {
+				myPlayer.setGameState(Player.GAME_OVER);
+			}
 	 }
 	 
 	 /**
